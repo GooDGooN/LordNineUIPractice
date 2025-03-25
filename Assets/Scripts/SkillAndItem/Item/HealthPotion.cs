@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class HealthPotion : ItemBase, IUsable, ICooldown
 {
@@ -7,30 +9,24 @@ public class HealthPotion : ItemBase, IUsable, ICooldown
     public CooldownType MyCooldownType => CooldownType.Health;
     public override ItemRarity Rarity => ItemRarity.Normal;
 
-    public float MyCooltime => 3.0f;
-    public float RemainCoolDown { get; set; }
+    public float UseCooltime => 1.0f;
+    public float CurrentCoolDown { get; set; }
 
     public override string Name => "회복 물약";
     public override string Description => "사용시 체력을 100 회복한다.";
     public override int Weight => 1;
     public override int Amount { get; set; }
 
-    public void AddItem(int amount)
-    {
-        Amount += amount;
-    }
+    public Func<Player, int> MyAction => UseAction;
 
-    public void UseAction()
+    private int UseAction(Player player)
     {
-        if (RemainCoolDown <= 0.0f)
+        if (CurrentCoolDown <= 0.0f)
         {
-            RemainCoolDown = MyCooltime;
+            CurrentCoolDown = UseCooltime;
             Amount -= 1;
+            player.GetHeal(100);
         }
-    }
-
-    public IEnumerable Test()
-    {
-        yield return new WaitForSeconds(1.0f);
+        return Amount;
     }
 }
