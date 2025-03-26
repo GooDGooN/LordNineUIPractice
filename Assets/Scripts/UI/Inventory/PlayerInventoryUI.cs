@@ -52,6 +52,7 @@ public class PlayerInventoryUI : MonoBehaviour
 
             tail.SetFocusItem = SetFocusingItem;
             tail.IsOnFucusing = IsSlotFocusing;
+            tail.PopSlot = PopSlot;
         }
     }
 
@@ -141,6 +142,13 @@ public class PlayerInventoryUI : MonoBehaviour
         return false;
     }
 
+    private void PopSlot(ItemAndSkillSlotUI slot)
+    {
+        mySlots.GoToTail(slot.gameObject);
+
+        slot.transform.SetAsLastSibling();
+    }
+
     public void AddNewItemToUISlot(ItemBase item)
     {
         var node = mySlots.Head;
@@ -155,8 +163,9 @@ public class PlayerInventoryUI : MonoBehaviour
             node = node.next;
         }
 
+        var itemIndex = data.Items.Count - 1;
         GetSlotComponent().MyItem = item;
-        GetSlotComponent().UseItem = () => data.UseItem(data.Items.Count - 1);
+        GetSlotComponent().UseItem = () => data.UseItem(itemIndex);
 
         ItemAndSkillSlotUI GetSlotComponent() => node.value.GetComponent<ItemAndSkillSlotUI>();
     }

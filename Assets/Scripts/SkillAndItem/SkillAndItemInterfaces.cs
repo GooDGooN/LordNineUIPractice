@@ -7,7 +7,7 @@ interface IUsable<T>
 
     public int UseAction (T target);
 
-    public Func<T, int> MyAction { get; }
+    public Func<T, int> MyAction => UseAction;
 }
 interface ICooldown
 {

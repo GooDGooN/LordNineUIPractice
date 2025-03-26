@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomCircleLinkedList<T>
@@ -66,6 +67,40 @@ public class CustomCircleLinkedList<T>
         prevHead.prev = Head;
         Head.prev = Tail;
         
+        return this;
+    }
+
+    public CustomCircleLinkedList<T> GoToTail(T targetValue)
+    {
+        var node = Head;
+
+        while (!EqualityComparer<T>.Default.Equals(node.value, targetValue))
+        {
+            if (node == Tail)
+            {
+                return null;
+            }
+
+            node = node.next;
+        }
+
+        if (node == Head)
+        {
+            HeadToTail();
+            return this;
+        }
+
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+
+        Tail.next = node;
+        Head.prev = node;
+
+        node.next = Head;
+        node.prev = Tail;
+
+        Tail = node;
+
         return this;
     }
 

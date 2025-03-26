@@ -8,6 +8,10 @@ using Random = UnityEngine.Random;
 public enum TestItemType
 {
     Potion,
+    SpeedScroll,
+    RegenerateScroll,
+    WeightScroll,
+
 }
 
 public class UITest : MonoBehaviour
@@ -33,6 +37,9 @@ public class UITest : MonoBehaviour
         switch (rn)
         {
             case TestItemType.Potion: MyPlayer.Inventory.AddItem<HealthPotion>(amount); break;
+            case TestItemType.SpeedScroll: MyPlayer.Inventory.AddItem<SpeedScroll>(amount); break;
+            case TestItemType.RegenerateScroll: MyPlayer.Inventory.AddItem<RegenerateScroll>(amount); break;
+            case TestItemType.WeightScroll: MyPlayer.Inventory.AddItem<WeightScroll>(amount); break;
         }
     }
 }

@@ -20,6 +20,7 @@ public class ItemAndSkillSlotUI : MonoBehaviour
     public ItemBase MyItem;
 
     public Action UseItem;
+    public Action<ItemAndSkillSlotUI> PopSlot;
     public Action<ItemAndSkillSlotUI> SetFocusItem;
     public Func<ItemAndSkillSlotUI, bool> IsOnFucusing; 
 
@@ -76,6 +77,7 @@ public class ItemAndSkillSlotUI : MonoBehaviour
             if (MyItem?.Amount <= 0)
             {
                 MyItem = null;
+                PopSlot.Invoke(this);
 
                 if (IsOnFucusing.Invoke(this))
                 {
