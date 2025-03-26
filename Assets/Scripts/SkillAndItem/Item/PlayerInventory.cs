@@ -2,15 +2,19 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerInventory 
 {
     private Player myPlayer;
+
     public readonly List<ItemBase> Items;
     public readonly List<ItemBase> CooldownItems;
 
     public int MaxCapacity = 500;
     public int CurrentCapacity = 200;
+
+    public UnityEvent<ItemBase> OnAddNewItem = new();
 
     public ItemBase this [int index]
     {
@@ -29,14 +33,16 @@ public class PlayerInventory
         if (Items[index] is IUsable<Player> item)
         {
             var remain = item.MyAction.Invoke(myPlayer);
-            if(item is ICooldown cooldownItem)
+
+            if (item is ICooldown cooldownItem)
             {
                 SetTypeCooldown(cooldownItem.MyCooldownType, 1.0f);
             }
+
             if (remain <= 0)
             {
-                Items.RemoveAt(index);
                 CooldownItems.Remove(Items[index]);
+                Items.RemoveAt(index);
             }
         }
     }
@@ -47,7 +53,7 @@ public class PlayerInventory
         {
             if (item is ICooldown cooldownItem)
             {
-                if (cooldownItem.MyCooldownType == type && cooldownItem.CurrentCoolDown == 0.0f)
+                if (cooldownItem.MyCooldownType == type && cooldownItem.CurrentCooltime == 0.0f)
                 {
                     cooldownItem.SetTypeUseCooltime();
                 }
@@ -61,15 +67,37 @@ public class PlayerInventory
         {
             if (CooldownItems[i] is ICooldown cooldownItem)
             {
-                if (cooldownItem.CurrentCoolDown > 0.0f)
+                if (cooldownItem.CurrentCooltime > 0.0f)
                 {
-                    cooldownItem.CurrentCoolDown -= Time.deltaTime;
+                    cooldownItem.CurrentCooltime -= Time.deltaTime;
                 }
                 else
                 {
-                    cooldownItem.CurrentCoolDown = 0.0f;
+                    cooldownItem.CurrentCooltime = 0.0f;
                 }
             }
+        }
+    }
+
+    public void AddItem<T>(int amount = 1) where T : ItemBase, new()
+    {
+        var index = Items.FindIndex(elem => elem.GetType() == typeof(T));
+
+        if (index >= 0)
+        {
+            Items[index].AddItem(amount);
+        }
+        else
+        {
+            var newItem = new T();
+
+            newItem.AddItem(amount);
+            Items.Add(newItem);
+            if(newItem is ICooldown)
+            {
+                CooldownItems.Add(newItem);
+            }
+            OnAddNewItem?.Invoke(newItem);
         }
     }
 }

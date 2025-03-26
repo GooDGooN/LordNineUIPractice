@@ -1,12 +1,11 @@
 using System;
-using UnityEngine;
 
-
+/// <typeparam name="T">T is binding target</typeparam>
 interface IUsable<T>
 {
     public ActionType MyActionType { get; }
-    
-    public void UseAction();
+
+    public int UseAction (T target);
 
     public Func<T, int> MyAction { get; }
 }
@@ -16,10 +15,12 @@ interface ICooldown
 
     public void SetCooldown(float time)
     {
-        CurrentCoolDown = time;
+        CurrentCooltime = time;
     }
     
-    public float UseCooltime { get; }
+    public float MyUseCooltime { get; }
+
+    public float CurrentCooltime { get; set; }
 
     public float SetTypeUseCooltime()
     {
@@ -37,7 +38,4 @@ interface ICooldown
             default: return 1.0f; // health potion, ects..
         }
     }
-
-    public float CurrentCoolDown { get; set; }
-
 }

@@ -2,39 +2,39 @@ using UnityEngine;
 
 public class CustomCircleLinkedList<T>
 {
-    private Node head;
-    private Node tail;
+    public Node Head;
+    public Node Tail;
 
     public CustomCircleLinkedList<T> AddNode(T node, bool addToHead = false)
     {
         var newNode = new Node(node);
-        if (head == null)
+        if (Head == null)
         {
-            tail = head = newNode;
+            Tail = Head = newNode;
         }
         else
         {
             if (addToHead)
             {
-                var temp = head;
+                var temp = Head;
 
-                head = newNode;
-                head.next = temp;
-                head.prev = tail;
+                Head = newNode;
+                Head.next = temp;
+                Head.prev = Tail;
 
-                tail.next = head;
-                temp.prev = head;
+                Tail.next = Head;
+                temp.prev = Head;
             }
             else
             {
-                var temp = tail;
+                var temp = Tail;
 
-                tail = newNode;
-                tail.next = head;
-                tail.prev = temp;
+                Tail = newNode;
+                Tail.next = Head;
+                Tail.prev = temp;
 
-                head.prev = tail;
-                temp.next = tail;
+                Head.prev = Tail;
+                temp.next = Tail;
             }
         }
 
@@ -43,35 +43,35 @@ public class CustomCircleLinkedList<T>
 
     public CustomCircleLinkedList<T> HeadToTail()
     {
-        var prevHead = head;
-        var prevTail = tail;
+        var prevHead = Head;
+        var prevTail = Tail;
 
-        head = prevHead.next;
-        tail = prevHead;
+        Head = prevHead.next;
+        Tail = prevHead;
 
-        prevTail.next = tail;
-        tail.next = head;
+        prevTail.next = Tail;
+        Tail.next = Head;
 
         return this;
     }
 
     public CustomCircleLinkedList<T> TailToHead()
     {
-        var prevHead = head;
-        var prevTail = tail;
+        var prevHead = Head;
+        var prevTail = Tail;
 
-        head = prevTail;
-        tail = prevTail.prev;
+        Head = prevTail;
+        Tail = prevTail.prev;
 
-        prevHead.prev = head;
-        head.prev = tail;
+        prevHead.prev = Head;
+        Head.prev = Tail;
         
         return this;
     }
 
-    public T GetHeadValue() => head.value;
+    public T GetHeadValue() => Head.value;
 
-    public T GetTailValue() => tail.value;
+    public T GetTailValue() => Tail.value;
 
     public class Node
     {

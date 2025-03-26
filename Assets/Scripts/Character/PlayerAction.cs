@@ -17,4 +17,10 @@ public partial class Player
         Health = Math.Clamp(Health + value, 0, MaxHealth);
         return this;
     }
+
+    public Player AddItemToInventory<T>(int amount) where T : ItemBase, new()
+    {
+        Inventory.AddItem<T>(amount);
+        return this;
+    }
 }
