@@ -12,7 +12,7 @@ public class PlayerInventoryUI : MonoBehaviour
     public GameObject ItemSlotPrefab;
     public GameObject Container;
 
-    public ItemAndSkillSlotUI FocusingSlot;
+    public InventorySlotUI FocusingSlot;
 
     private CustomCircleLinkedList<GameObject> mySlots;
     private PlayerInventory data;
@@ -48,7 +48,7 @@ public class PlayerInventoryUI : MonoBehaviour
         {
             mySlots.AddNode(Instantiate(ItemSlotPrefab, Container.transform));
 
-            var tail = mySlots.GetTailValue().GetComponent<ItemAndSkillSlotUI>();
+            var tail = mySlots.GetTailValue().GetComponent<InventorySlotUI>();
 
             tail.SetFocusItem = SetFocusingItem;
             tail.IsOnFucusing = IsSlotFocusing;
@@ -116,33 +116,34 @@ public class PlayerInventoryUI : MonoBehaviour
             if (data.Items.Count > itemIndex)
             {
                 GetSlotComponent().MyItem = data[itemIndex];
-                GetSlotComponent().UseItem = () => data.UseItem(itemIndex);
+                GetSlotComponent().UseItem = (item) => data.UseItem(item);
             }
             else
             {
                 GetSlotComponent().MyItem = null;
             }
 
-            ItemAndSkillSlotUI GetSlotComponent() => slot.GetComponent<ItemAndSkillSlotUI>();
+            InventorySlotUI GetSlotComponent() => slot.GetComponent<InventorySlotUI>();
         }
     }
 
-    private void SetFocusingItem(ItemAndSkillSlotUI slot)
+    private void SetFocusingItem(InventorySlotUI slot)
     {
         FocusingSlot?.OutFucus();
         FocusingSlot = slot;
     }
 
-    private bool IsSlotFocusing(ItemAndSkillSlotUI slot)
+    private bool IsSlotFocusing(InventorySlotUI slot)
     {
         if (slot == FocusingSlot)
         {
             return true;
         }
+
         return false;
     }
 
-    private void PopSlot(ItemAndSkillSlotUI slot)
+    private void PopSlot(InventorySlotUI slot)
     {
         mySlots.GoToTail(slot.gameObject);
 
@@ -153,20 +154,23 @@ public class PlayerInventoryUI : MonoBehaviour
     {
         var node = mySlots.Head;
 
-        while (GetSlotComponent().MyItem != null)
+        if (data.Items.Count / 4 >= savedRowIndex)
         {
-            if (node == mySlots.Tail)
+            while (GetSlotComponent().MyItem != null)
             {
-                return;
+                if (node == mySlots.Tail)
+                {
+                    return;
+                }
+
+                node = node.next;
             }
 
-            node = node.next;
+            var itemIndex = data.Items.Count - 1;
+            GetSlotComponent().MyItem = item;
+            GetSlotComponent().UseItem = (item) => data.UseItem(item);
+
+            InventorySlotUI GetSlotComponent() => node.value.GetComponent<InventorySlotUI>();
         }
-
-        var itemIndex = data.Items.Count - 1;
-        GetSlotComponent().MyItem = item;
-        GetSlotComponent().UseItem = () => data.UseItem(itemIndex);
-
-        ItemAndSkillSlotUI GetSlotComponent() => node.value.GetComponent<ItemAndSkillSlotUI>();
     }
 }

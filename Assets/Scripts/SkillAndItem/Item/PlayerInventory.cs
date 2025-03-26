@@ -28,21 +28,21 @@ public class PlayerInventory
         CooldownItems = new();
     }
 
-    public void UseItem(int index) 
+    public void UseItem(ItemBase item) 
     {
-        if (Items[index] is IUsable<Player> item)
+        if (item is IUsable<Player> usable)
         {
-            var remain = item.MyAction.Invoke(myPlayer);
+            var remain = usable.MyAction.Invoke(myPlayer);
 
-            if (item is ICooldown cooldownItem)
+            if (usable is ICooldown cooldownItem)
             {
                 SetTypeCooldown(cooldownItem.MyCooldownType, 1.0f);
             }
 
             if (remain <= 0)
             {
-                CooldownItems.Remove(Items[index]);
-                Items.RemoveAt(index);
+                CooldownItems.Remove(item);
+                Items.Remove(item);
             }
         }
     }

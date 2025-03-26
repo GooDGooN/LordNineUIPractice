@@ -4,25 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class ItemAndSkillSlotUI : MonoBehaviour
+public class InventorySlotUI : SlotUIBase<ItemBase>
 {
-    public Image ChargeLineImage;
-    public Image TargetIcon;
-    public Image CooltimeCover;
-
-    public TMP_Text AmountText;
-    public TMP_Text CooltimeText;
-
-    public GameObject ItemInfoParent;
-    public GameObject FocusButtonParent;
-    public GameObject CooldownParent;
-
-    public ItemBase MyItem;
-
-    public Action UseItem;
-    public Action<ItemAndSkillSlotUI> PopSlot;
-    public Action<ItemAndSkillSlotUI> SetFocusItem;
-    public Func<ItemAndSkillSlotUI, bool> IsOnFucusing; 
+    public Action<ItemBase> UseItem;
+    public Action<InventorySlotUI> PopSlot;
+    public Action<InventorySlotUI> SetFocusItem;
+    public Func<InventorySlotUI, bool> IsOnFucusing; 
 
     private void Update()
     {
@@ -31,11 +18,12 @@ public class ItemAndSkillSlotUI : MonoBehaviour
             ItemInfoParent.SetActive(true);
 
             AmountText.text = $"{MyItem.Amount}";
-            TargetIcon.sprite = MyItem.IconSprite;
+            Icon.sprite = MyItem.IconSprite;
 
             if (MyItem is ICooldown cooldown)
             {
-                ChargeLineImage.fillAmount = cooldown.CurrentCooltime / cooldown.MyUseCooltime;
+                ChargeLine.fillAmount = cooldown.CurrentCooltime / cooldown.MyUseCooltime;
+
                 if (cooldown.CurrentCooltime > 0.0f)
                 {
                     CooldownParent.SetActive(true);
@@ -56,13 +44,14 @@ public class ItemAndSkillSlotUI : MonoBehaviour
                     {
                         FocusButtonParent.SetActive(true);
                     }
+
                     CooldownParent.SetActive(false);
                 }
             }
         }
         else
         {
-            ChargeLineImage.fillAmount = 0.0f;
+            ChargeLine.fillAmount = 0.0f;
             ItemInfoParent.SetActive(false);
             UseItem = null;
         }
@@ -72,7 +61,7 @@ public class ItemAndSkillSlotUI : MonoBehaviour
     {
         if (FocusButtonParent.activeSelf)
         {
-            UseItem?.Invoke();
+            UseItem?.Invoke(MyItem);
 
             if (MyItem?.Amount <= 0)
             {
