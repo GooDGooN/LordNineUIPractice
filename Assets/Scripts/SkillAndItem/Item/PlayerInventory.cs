@@ -53,9 +53,9 @@ public class PlayerInventory
         {
             if (item.Value is ICooldown cooldownItem)
             {
-                if (cooldownItem.MyCooldownType == type && cooldownItem.CurrentCooltime == 0.0f)
+                if (cooldownItem.MyCooldownType == type && cooldownItem.CurrentCooltime < cooldownItem.SetTypeUseCooltime())
                 {
-                    cooldownItem.SetTypeUseCooltime();
+                    cooldownItem.CurrentCooltime = cooldownItem.SetTypeUseCooltime();
                 }
             }
         }
