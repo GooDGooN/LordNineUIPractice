@@ -9,18 +9,21 @@ public partial class Player
     public Player GetDamage(int value)
     {
         Health = Math.Clamp(Health - value, 0, MaxHealth);
+
         return this;
     }
 
     public Player GetHeal(int value)
     {
         Health = Math.Clamp(Health + value, 0, MaxHealth);
+
         return this;
     }
 
-    public Player AddItemToInventory<T>(int amount) where T : ItemBase, new()
+    public Player AddItemToInventory(ItemBase item, int amount)
     {
-        Inventory.AddItem<T>(amount);
+        Inventory.AddItem(item, amount);
+
         return this;
     }
 }

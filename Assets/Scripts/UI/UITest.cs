@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -22,6 +23,13 @@ public class UITest : MonoBehaviour
     public TMP_Text HealthText;
     public TMP_Text ManaText;
 
+    private CooldownItemPool itemPool;
+
+    private void Awake()
+    {
+        itemPool = new();
+    }
+
     private void Update()
     {
         HealthText.text = $"HP: {MyPlayer.Health}";
@@ -30,17 +38,9 @@ public class UITest : MonoBehaviour
 
     public void AddRandomItem()
     {
-        var max = Enum.GetNames(typeof(TestItemType));
-        var rn = (TestItemType)Random.Range(0, max.Length);
         var amount = Random.Range(1, 2);
 
-        switch (rn)
-        {
-            case TestItemType.Potion: MyPlayer.Inventory.AddItem<HealthPotion>(amount); break;
-            case TestItemType.SpeedScroll: MyPlayer.Inventory.AddItem<SpeedScroll>(amount); break;
-            case TestItemType.RegenerateScroll: MyPlayer.Inventory.AddItem<RegenerateScroll>(amount); break;
-            case TestItemType.WeightScroll: MyPlayer.Inventory.AddItem<WeightScroll>(amount); break;
-        }
+        MyPlayer.AddItemToInventory(itemPool.GetRandomItemFromPool(), amount);
     }
 }
 

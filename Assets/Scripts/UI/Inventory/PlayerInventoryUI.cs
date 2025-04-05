@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -14,7 +15,20 @@ public class PlayerInventoryUI : MonoBehaviour
 
     public InventorySlotUI FocusingSlot;
 
-    private CustomCircleLinkedList<GameObject> mySlots;
+    public PlayerHotkeyUI HotkeyUI;
+
+    public ItemBase FocusingItem {
+        get
+        {
+            if (FocusingSlot != null)
+            {
+                return data.GetUsableItem(FocusingSlot.ItemName);
+            }
+            return null;
+        }
+    }
+
+    private CustomCircleLinkedList<InventorySlotUI> mySlots;
     private PlayerInventory data;
     private Rect frameRect;
 
@@ -46,20 +60,25 @@ public class PlayerInventoryUI : MonoBehaviour
 
         for (int i = 0; i < SlotFullAmount; i++)
         {
-            mySlots.AddNode(Instantiate(ItemSlotPrefab, Container.transform));
+            var inst = Instantiate(ItemSlotPrefab, Container.transform);
+            var nodeValue = inst.GetComponent<InventorySlotUI>();
 
-            var tail = mySlots.GetTailValue().GetComponent<InventorySlotUI>();
+            mySlots.AddNode(nodeValue);
 
-            tail.SetFocusItem = SetFocusingItem;
-            tail.IsOnFucusing = IsSlotFocusing;
-            tail.PopSlot = PopSlot;
+            nodeValue.SetFocusItem = SetFocusingItem;
+            nodeValue.IsOnFucusing = IsSlotFocusing;
+            nodeValue.PopSlot = PopSlot;
         }
+
+        ResetSlots();
     }
 
     private void OnEnable()
     {
-        ContentRectTransform.localPosition = Vector3.right * 2.0f;
-        savedRowIndex = 0;
+        if (mySlots != null)
+        {
+            ResetSlots();
+        }
     }
 
     private void Update()
@@ -108,22 +127,62 @@ public class PlayerInventoryUI : MonoBehaviour
             Container.transform.localPosition = Vector3.down * savedRowIndex * slotSize;
         }
 
-        void SetItemSlot(GameObject slot, int index)
+        void SetItemSlot(InventorySlotUI slot, int index)
         {
             var row = currentRowIndex > savedRowIndex ? containerRowSlotAmount + savedRowIndex + 2 : savedRowIndex - 1;
             var itemIndex = (row * 4) + index;
 
             if (data.Items.Count > itemIndex)
             {
-                GetSlotComponent().MyItem = data[itemIndex];
-                GetSlotComponent().UseItem = (item) => data.UseItem(item);
+                var name = data[itemIndex].Name;
+                var item = data.Items[itemIndex];
+
+                BindItemToSlot(item, slot);
             }
             else
             {
-                GetSlotComponent().MyItem = null;
+                slot.UnBindItem();
             }
 
-            InventorySlotUI GetSlotComponent() => slot.GetComponent<InventorySlotUI>();
+        }
+    }
+
+    private void ResetSlots()
+    {
+        ContentRectTransform.localPosition = Vector3.right * 2.0f;
+        savedRowIndex = 0;
+
+        var node = mySlots.Head;
+        var index = 0;
+
+        while (node.value.ItemName != "" || index < data.Items.Count)
+        {
+            if (index < data.Items.Count)
+            {
+                BindItemToSlot(data.Items[index], node.value);
+            }
+            else
+            {
+                node.value.UnBindItem();
+            }
+            
+            node = node.next;
+            index++;
+        }
+    }
+
+    private void BindItemToSlot(ItemBase item, InventorySlotUI slot)
+    {
+        slot.ItemName = item.Name;
+        slot.Icon.sprite = item.IconSprite;
+
+        slot.GetAmount = () => item?.Amount ?? 0;
+        slot.UseItem = () => (item as IUsable)?.MyAction.Invoke();
+
+        if (item is ICooldown cooldown)
+        {
+            slot.GetCooltime = () => cooldown?.CurrentCooltime ?? 0;
+            slot.GetMaxCooltime = () => cooldown?.MaxCooltime ?? 1;
         }
     }
 
@@ -145,7 +204,7 @@ public class PlayerInventoryUI : MonoBehaviour
 
     private void PopSlot(InventorySlotUI slot)
     {
-        mySlots.GoToTail(slot.gameObject);
+        mySlots.GoToTail(slot);
 
         slot.transform.SetAsLastSibling();
     }
@@ -156,7 +215,7 @@ public class PlayerInventoryUI : MonoBehaviour
 
         if (data.Items.Count / 4 >= savedRowIndex)
         {
-            while (GetSlotComponent().MyItem != null)
+            while (GetSlotComponent().ItemName != "")
             {
                 if (node == mySlots.Tail)
                 {
@@ -166,9 +225,7 @@ public class PlayerInventoryUI : MonoBehaviour
                 node = node.next;
             }
 
-            var itemIndex = data.Items.Count - 1;
-            GetSlotComponent().MyItem = item;
-            GetSlotComponent().UseItem = (item) => data.UseItem(item);
+            BindItemToSlot(item, GetSlotComponent());
 
             InventorySlotUI GetSlotComponent() => node.value.GetComponent<InventorySlotUI>();
         }

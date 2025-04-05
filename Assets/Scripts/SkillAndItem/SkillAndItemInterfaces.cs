@@ -1,26 +1,38 @@
 using System;
 
-/// <typeparam name="T">T is binding target</typeparam>
-interface IUsable<T>
+interface IUsable
 {
     public ActionType MyActionType { get; }
 
-    public int UseAction (T target);
+    public int UseAction(object target);
 
-    public Func<T, int> MyAction => UseAction;
+    public object Target { get; set; }
+
+    public Func<int> MyAction { get; set; }
+
+    public void InitializeUsable(object target)
+    {
+        Target = target;
+        MyAction = () => UseAction(target);
+    }
 }
+
 interface ICooldown
 {
     public CooldownType MyCooldownType { get; }
+
+    public Action<CooldownType> SetTypeCooldown { get; set; }
 
     public void SetCooldown(float time)
     {
         CurrentCooltime = time;
     }
     
-    public float MyUseCooltime { get; }
+    public float MaxCooltime { get; }
 
     public float CurrentCooltime { get; set; }
+
+    public bool IsAutoUse { get; set; }
 
     public float SetTypeUseCooltime()
     {
@@ -28,12 +40,15 @@ interface ICooldown
         {
             case CooldownType.HoningStone:
             case CooldownType.Scroll:
-            case CooldownType.Oil: return 0.5f;
+            case CooldownType.Oil: 
+                return 0.5f;
 
             case CooldownType.ActiveSkill:
-            case CooldownType.ActiveAbility: return 2.0f;
+            case CooldownType.ActiveAbility: 
+                return 2.0f;
 
-            case CooldownType.Elixer: return 120.0f;
+            case CooldownType.Elixer: 
+                return 120.0f;
 
             default: return 1.0f; // health potion, ects..
         }

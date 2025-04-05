@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: ca8e4ebb8a4e9c64fbf82e7cad0988aa, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -683,12 +683,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ChargeLine: {fileID: 2207112877474857045}
   Icon: {fileID: 26839565876052084}
-  CooldownCover: {fileID: 4858971802276115242}
   AmountText: {fileID: 6960150142772491965}
   CooltimeText: {fileID: 3308831771801636230}
   ItemInfoParent: {fileID: 7848846150809583432}
   FocusButtonParent: {fileID: 8970680280453027351}
   CooldownParent: {fileID: 7035310800500090440}
+  ItemName: 
 --- !u!1 &6047012838488552250
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,7 +997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6492342192145144326
 RectTransform:
   m_ObjectHideFlags: 0

@@ -9,9 +9,12 @@ public abstract class ItemBase
     public abstract int Weight { get; }
     public abstract int Amount { get; set; }
     public abstract ItemRarity Rarity { get; }
+    public abstract Action<ItemBase> RequestRemove { get; set; }
 
     protected abstract string iconPath { get; }
+
     public virtual Sprite IconSprite { get; protected set; }
+
     public ItemBase() 
     {
         IconSprite = Resources.Load<Sprite>(iconPath);
