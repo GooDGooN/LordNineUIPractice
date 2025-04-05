@@ -80,6 +80,14 @@ public class HotkeySlotUI : SlotUIBase<Object>, IPointerDownHandler
         }
     }
 
+    private void UseSlotItem()
+    {
+        if (GetAmount?.Invoke() > 0)
+        {
+            UseItem?.Invoke();
+        }
+    }
+
     public void Onclick()
     {
         var isRegist = RegistUsableObject.Invoke(this);
@@ -115,6 +123,11 @@ public class HotkeySlotUI : SlotUIBase<Object>, IPointerDownHandler
         }
     }
 
+    public void SetFocusNull()
+    {
+        SetFocus.Invoke(null);
+    }
+
     public void DisableUnbindButton()
     {
         UnbindButtonParent.SetActive(false);
@@ -125,14 +138,6 @@ public class HotkeySlotUI : SlotUIBase<Object>, IPointerDownHandler
         base.UnBindItem();
 
         isClicked = false;
-    }
-
-    private void UseSlotItem()
-    {
-        if (GetAmount?.Invoke() > 0)
-        {
-            UseItem?.Invoke();
-        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
